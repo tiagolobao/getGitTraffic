@@ -1,0 +1,18 @@
+{
+  "name": "getgitTraffic",
+  "version": "1.0.0",
+  "description": "Get github traffic",
+  "main": "index.js",
+  "dependencies": {
+    "json-sql": "^0.4.11",
+    "mysql": "^2.16.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Tiago Britto Lobão",
+  "license": "MIT"
+}

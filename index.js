@@ -3,6 +3,7 @@
 
 /* Add Requires */
 var config = require('./config.js');
+var incs = require('./incs.js');
 var jsonSql = require('json-sql')();
 var request = require('request');
 var mysql = require('mysql').createConnection({
@@ -30,19 +31,27 @@ mysql.connect(function(err) {
 
 githubRequest({uri: 'traffic/popular/referrers'},(err,response,body)=>{
   console.log("Getting referrers...");
-  JSON.parse(body).forEach((value)=>{
-      let sql = 'INSERT INTO `Referrers` (`referrer`, `count`, `unique`) VALUES ("'+value.referrer+'",'+value.count+','+value.uniques+')';
-      console.log(sql);
-      mysql.query(sql,(err, result)=>{
-      });
+  console.log(JSON.parse(body)[0]);
+  var sql = jsonSql.build({
+  	type: 'insert',
+  	table: 'Referrers',
+  	values: JSON.parse(body),
+  });
+  var sqlQuery = sql.query.replace(/"/g,'`');
+  // Object.keys(sql.values).forEach((objectKey, index)=>{
+  //   sqlQuery = sqlQuery.replace('$'+objectKey,'"'+sql.values[objectKey]+'"');
+  // });
+  mysql.query(sqlQuery,(err,result)=>{
+    console.log(result);
+    console.error(err);
   });
 });
 
 githubRequest({uri: '/traffic/popular/paths'},(err,response,body)=>{
-  console.log("Getting paths...");
+  // console.log("Getting paths...");
   JSON.parse(body).forEach((value)=>{
-    let sql = 'INSERT INTO `Paths` (`path`, `title`, `count`, `unique`) VALUES ("'+value.path+'","'+value.title+'",'+value.count+','+value.uniques+')';
-    console.log(sql);
+    let sql = 'INSERT INTO `Paths` (`path`, `title`, `count`, `uniques`) VALUES ("'+value.path+'","'+value.title+'",'+value.count+','+value.uniques+')';
+    // console.log(sql);
     mysql.query(sql,(err, result)=>{
     });
   });

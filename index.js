@@ -30,43 +30,44 @@ mysql.connect(function(err) {
 });
 
 githubRequest({uri: 'traffic/popular/referrers'},(err,response,body)=>{
-  console.log("Getting referrers...");
   console.log(JSON.parse(body)[0]);
-  var sql = jsonSql.build({
+  let sql = jsonSql.build({
   	type: 'insert',
   	table: 'Referrers',
   	values: JSON.parse(body),
   });
-  var sqlQuery = sql.query.replace(/"/g,'`');
-  // Object.keys(sql.values).forEach((objectKey, index)=>{
-  //   sqlQuery = sqlQuery.replace('$'+objectKey,'"'+sql.values[objectKey]+'"');
-  // });
-  mysql.query(sqlQuery,(err,result)=>{
+  mysql.query(incs.parseSQL(sql),(err,result)=>{
     console.log(result);
     console.error(err);
   });
 });
 
 githubRequest({uri: '/traffic/popular/paths'},(err,response,body)=>{
-  // console.log("Getting paths...");
-  JSON.parse(body).forEach((value)=>{
-    let sql = 'INSERT INTO `Paths` (`path`, `title`, `count`, `uniques`) VALUES ("'+value.path+'","'+value.title+'",'+value.count+','+value.uniques+')';
-    // console.log(sql);
-    mysql.query(sql,(err, result)=>{
-    });
+  console.log(JSON.parse(body)[0]);
+  let sql = jsonSql.build({
+  	type: 'insert',
+  	table: 'Paths',
+  	values: JSON.parse(body),
+  });
+  mysql.query(incs.parseSQL(sql),(err,result)=>{
+    console.log(result);
+    console.error(err);
   });
 });
 
-/*
 githubRequest({uri: '/traffic/views'},(err,response,body)=>{
-  let obj = JSON.parse(body);
-  console.log(obj);
-  console.log("SEPARADOR");
+  console.log(JSON.parse(body)[0]);
+  let sql = jsonSql.build({
+    type: 'insert',
+    table: 'Views',
+    values: JSON.parse(body).views,
+  });
+  mysql.query(incs.parseSQL(sql),(err,result)=>{
+    console.log(result);
+    console.error(err);
+  });
 });
 
 githubRequest({uri: '/traffic/clones'},(err,response,body)=>{
-  let obj = JSON.parse(body);
-  console.log(obj);
-  console.log("SEPARADOR");
+  console.log(body);
 });
-*/

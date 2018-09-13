@@ -1,19 +1,14 @@
 "use strict";
 
-
 /* Add Requires */
 var config = require('./config.js');
 var incs = require('./incs.js');
 var jsonSql = require('json-sql')();
 var request = require('request');
-var mysql = require('mysql').createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'redeLogos2014',
-  database: 'gh-traffic'
-});
+var CronJob = require('cron').CronJob;
+var mysql = require('mysql').createConnection(config.sqlOptions);
 
-/* request */
+/* default request */
 var githubRequest = request.defaults({
   baseUrl: 'https://api.github.com/repos/' + config.repo.owner + '/' + config.repo.name + '/',
   method: 'GET',
@@ -23,51 +18,46 @@ var githubRequest = request.defaults({
   }
 });
 
-/* mysql */
+/* mysql connect */
 mysql.connect(function(err) {
   if (err) throw err;
   console.log("mysql Connected!");
 });
 
-githubRequest({uri: 'traffic/popular/referrers'},(err,response,body)=>{
-  console.log(JSON.parse(body)[0]);
-  let sql = jsonSql.build({
-  	type: 'insert',
-  	table: 'Referrers',
-  	values: JSON.parse(body),
+/* Scheduled function: Every day at midnight */
+new CronJob('00 00 00 * * *', function() {
+  console.log('Scheduled Script! Getting github traffic information');
+  let argsDefault = {mysql: mysql, jsonSql: jsonSql};
+  githubRequest({uri: 'traffic/popular/referrers'},(err,response,body)=>{
+    let args = {values: JSON.parse(body), table: 'Referrers'};
+    incs.insertFromGithubSQL({...argsDefault, ...args});
   });
-  mysql.query(incs.parseSQL(sql),(err,result)=>{
-    console.log(result);
-    console.error(err);
+  githubRequest({uri: '/traffic/popular/paths'},(err,response,body)=>{
+    let args = {values: JSON.parse(body), table: 'Paths'};
+    incs.insertFromGithubSQL({...argsDefault, ...args});
   });
-});
-
-githubRequest({uri: '/traffic/popular/paths'},(err,response,body)=>{
-  console.log(JSON.parse(body)[0]);
-  let sql = jsonSql.build({
-  	type: 'insert',
-  	table: 'Paths',
-  	values: JSON.parse(body),
+  githubRequest({uri: '/traffic/views'},(err,response,body)=>{
+    //Views by day
+    let values = JSON.parse(body);
+    let args = {values: values.views, table: 'Views'};
+    incs.insertFromGithubSQL({...argsDefault, ...args});
+    //Views by week
+    args = {
+      values: [{uniques: values.uniques, count: values.count}],
+      table: 'ViewsWeek',
+    };
+    incs.insertFromGithubSQL({...argsDefault, ...args});
   });
-  mysql.query(incs.parseSQL(sql),(err,result)=>{
-    console.log(result);
-    console.error(err);
+  githubRequest({uri: '/traffic/clones'},(err,response,body)=>{
+    //Clones by day
+    let values = JSON.parse(body);
+    let args = {values: values.clones, table: 'Clones'};
+    incs.insertFromGithubSQL({...argsDefault, ...args});
+    //Clones by week
+    args = {
+      values: [{uniques: values.uniques, count: values.count}],
+      table: 'ClonesWeek',
+    };
+    incs.insertFromGithubSQL({...argsDefault, ...args});
   });
-});
-
-githubRequest({uri: '/traffic/views'},(err,response,body)=>{
-  console.log(JSON.parse(body)[0]);
-  let sql = jsonSql.build({
-    type: 'insert',
-    table: 'Views',
-    values: JSON.parse(body).views,
-  });
-  mysql.query(incs.parseSQL(sql),(err,result)=>{
-    console.log(result);
-    console.error(err);
-  });
-});
-
-githubRequest({uri: '/traffic/clones'},(err,response,body)=>{
-  console.log(body);
-});
+}, null, true, 'America/Bahia');

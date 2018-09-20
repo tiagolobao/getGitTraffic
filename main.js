@@ -25,7 +25,7 @@ mysql.connect(function(err) {
 });
 
 /* Scheduled function: Every day at midnight */
-new CronJob('00 00 00 * * *', function() {
+new CronJob(config.cron, function() {
   console.log('Scheduled Script! Getting github traffic information');
   let argsDefault = {mysql: mysql, jsonSql: jsonSql};
   githubRequest({uri: 'traffic/popular/referrers'},(err,response,body)=>{

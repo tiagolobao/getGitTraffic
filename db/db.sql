@@ -10,7 +10,8 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = '+3:00';
+
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -29,7 +30,6 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `Clones` (
-  `ID` int(11) NOT NULL,
   `count` int(11) NOT NULL,
   `uniques` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -54,7 +54,6 @@ CREATE TABLE `ClonesWeek` (
 --
 
 CREATE TABLE `Paths` (
-  `ID` int(11) NOT NULL,
   `path` text NOT NULL,
   `title` text NOT NULL,
   `count` int(11) NOT NULL,
@@ -80,7 +79,6 @@ CREATE TABLE `Referrers` (
 --
 
 CREATE TABLE `Views` (
-  `ID` int(11) NOT NULL,
   `count` int(11) NOT NULL,
   `uniques` int(11) NOT NULL,
   `timestamp` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
@@ -98,47 +96,6 @@ CREATE TABLE `ViewsWeek` (
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `Clones`
---
-ALTER TABLE `Clones`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `Paths`
---
-ALTER TABLE `Paths`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `Views`
---
-ALTER TABLE `Views`
-  ADD PRIMARY KEY (`ID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `Clones`
---
-ALTER TABLE `Clones`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `Paths`
---
-ALTER TABLE `Paths`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `Views`
---
-ALTER TABLE `Views`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
